@@ -7,4 +7,3 @@ gulp.task('coffee', function() {
     .pipe(gulpCoffee({bare: true}).on('error', gutil.log))
     .pipe(gulp.dest('./lib/'));
 });
-

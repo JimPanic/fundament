@@ -1,19 +1,21 @@
 {
-  "name": "platform-coffee",
-  "version": "0.1.2",
+  "name": "fundament",
+  "version": "1.0.0",
   "description": "A set of JavaScript modules and functions to work with builtin types in a functional manner.",
-  "author": "Alexander Pánek <a.panek@brainsware.org> (http://brainsware.org)",
+  "author": "Alexander Pánek <alexander@panek.work> (http://blog.panek.work)",
   "keywords": [
     "platform",
+    "fundament",
     "functional",
     "array",
     "hashes",
     "objects",
-    "types"
+    "types",
+    "test"
   ],
-  "homepage": "https://github.com/JimPanic/platform",
+  "homepage": "https://github.com/JimPanic/fundmanet",
   "bugs": {
-    "url": "https://github.com/JimPanic/platform/issues"
+    "url": "https://github.com/JimPanic/fundament/issues"
   },
   "license": "Apache 2.0",
   "files": [
@@ -22,21 +24,11 @@
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JimPanic/platform.git"
+    "url": "https://github.com/JimPanic/fundament.git"
   },
   "devDependencies": {
-    "coffee-script": "> 1.7.0",
-    "grunt": "0.4.x",
-    "grunt-cli": ">=0.1.6",
-    "browserify": "*",
-    "grunt-contrib-clean": "*",
-    "grunt-contrib-coffee": "*",
-    "grunt-contrib-uglify": "*",
-    "grunt-contrib-copy": "*",
-    "grunt-contrib-watch": "*",
-    "grunt-browserify": "*",
-    "grunt-modernizr": "*",
-    "grunt-bower-task": "git://github.com/creatorrr/grunt-bower-task.git"
+    "coffee-script": "^1.10.0",
+    "gulp-coffee": "^2.3.2"
   },
   "dependencies": {
     "colors": "^1.1.2"
