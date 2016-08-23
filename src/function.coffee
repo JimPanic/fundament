@@ -14,7 +14,7 @@ F = {
   # Apply an array as arguments to a function
   #
   # NOTE: Composable wrapper for Function.apply
-  args_from_array: (fn) -> (args) -> fn.apply @, args
+  apply: (fn) -> (args) -> fn.apply @, args
 
   # Compose a list of functions to a new function.
   #
@@ -52,7 +52,7 @@ F = {
   #   f = (a, b, c, d) -> console.log a, b, c, d
   #   g = partial_right f, 'yadda', 'foo'
   #   #=> g == (a, b) -> f a, b, 'yadda', 'foo'
-  partial_right: (fn, bound...) -> (args...) -> fn.apply @, A.concat(args, bound)
+  partialRight: (fn, bound...) -> (args...) -> fn.apply @, A.concat(args, bound)
 
   # Partially apply arguments to a function, starting with the last argument
   #
@@ -60,7 +60,7 @@ F = {
   #   f = (a, b, c) -> console.log a, b, c
   #   g = partial_reverse f, 'yadda', 'foo'
   #   #=> g == (a) -> f a, 'foo', 'yadda'
-  partial_reverse: (fn, bound...) ->
+  partialReverse: (fn, bound...) ->
     (args...) -> fn.apply @, A.concat(args, A.reverse(bound))
 }
 

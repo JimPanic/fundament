@@ -18,36 +18,47 @@ A = {
   # NOTE: This is just a composable wrapper for `Array.prototype.forEach`.
   each: (fn, array) ->
     array.forEach(fn)
-    
+
     return undefined
+
+  isEmpty: (array) -> !array? and array.length == 0
 
   # Compares length & value equality of two arrays.
   #
   # NOTE: This method also takes the order into account.
   equals: (a, b) ->
-    return false if a.length != b.length
+    return false if a.length isnt b.length
 
-    a.reduce (previous, current, i) -> return previous && b[i] == current
+    a.reduce (previous, current, index) ->
+       previous and b[index] == current
 
   # Composable wrapper for `Array.prototype.every`
   #
-  # NOTE: Instead of "falsy" or true, it always returns a Boolean value.
+  # NOTE: Instead of "falsy" or true, it always returns an actual Boolean value.
   every: (fn, array) -> true == array.every(fn)
 
-  # Composable wrapper for `Array.prototype.filter`
-  filter: (fn, array) -> array.filter(fn)
+  # Shorthand and composable wrapper for `Array.prototype.filter`
+  filter: (fn, array) -> array.filter fn
+
+  first: (array) ->
+    return undefined if !array? or array.length is 0
+
+    array[0]
+
+  # Transform nested arrays into one flat, continuous array
+  flatten: (array) -> A.reduce array, [], (a, b) -> a.concat(b)
 
   # Find out whether the array holds a given value.
-  has_element: (element, array) -> -1 != array.indexOf(element)
+  hasElement: (element, array) -> -1 != array.indexOf(element)
 
   # Composable wrapper for `Array.prototype.indexOf`
-  index_of: (element, array) -> array.indexOf(element)
+  indexOf: (element, array) -> array.indexOf(element)
 
   # Composable wrapper for `Array.prototype.join`
   join: (seperator, array) -> array.join(seperator)
 
   # Composable wrapper for `Array.prototype.lastIndexOf`
-  last_index_of: (element, array) -> array.lastIndexOf(element)
+  lastIndexOf: (element, array) -> array.lastIndexOf(element)
 
   # Composable wrapper for `Array.prototype.map`
   map: (fn, array) -> array.map(fn)
@@ -56,10 +67,18 @@ A = {
   reduce: (fn, initial_value, array) -> array.reduce(fn, initial_value)
 
   # Composable wrapper for `Array.reduceRight`
-  reduce_right: (fn, initial_value, array) -> array.reduceRight(fn, initial_value)
+  reduceRight: (fn, initial_value, array) -> array.reduceRight(fn, initial_value)
+
+  # Create a copy and replace `n` elements with given `replace_with` array
+  # at a given `index`.
+  #
+  # NOTE: This is a composable wrapper for `Array.splice`, which replaces items
+  #       in-place. The names deliberately differ.
+  replace: (index, n, replace_with, array) ->
+    A.clone(array).splice(index, n, replace_with)
 
   # Create a reversed version of the array and return it.
-  # 
+  #
   # NOTE: This is just a wrapper for `Array.reverse`, which reverses the array
   #       in-place.
   reverse: (array) -> A.clone(array).reverse()
@@ -80,15 +99,7 @@ A = {
   #
   # NOTE: This is a composable wrapper for `Array.sort`, which sorts the array
   #       in-place.
-  sort_by: (fn, array) -> A.clone(array).sort(fn)
-
-  # Create a copy and replace `n` elements with given `replace_with` array
-  # at a given `index`.
-  #
-  # NOTE: This is a composable wrapper for `Array.splice`, which replaces items
-  #       in-place. The names deliberately differ.
-  replace: (index, n, replace_with, array) ->
-    A.clone(array).splice(index, n, replace_with)
+  sortBy: (fn, array) -> A.clone(array).sort(fn)
 }
 
 module.exports = A

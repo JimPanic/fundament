@@ -1,7 +1,33 @@
 A = require './array'
 T = require './types'
 
+keys = Object.keys
+
 O = {
+  assign: (target, sources...) ->
+    return Object.assign target, sources... if Object.assign?
+
+    O._assignPolyfill target, sources...
+
+  # Polyfill for Object.assign
+  _assignPolyfill: (target, sources...) ->
+    throw new TypeError 'Cannot convert undefined or null to object' unless target?
+
+    reduceSource = (source) ->
+      (seed, key) ->
+        seed[key] = source[key]
+        seed
+
+    reduceSources = (seed, current) -> A.reduce reduceSource(current), seed, keys(current)
+
+    A.reduce reduceSources, Object(target), A.filter(T.isSomething, Array(sources...))
+
+  # This method is only used for testing the validity of the polyfill.
+  _assign: (polyfill, target, sources...) ->
+    return Object.assign(target, sources...) if Object.assign? and not polyfill
+
+    O.assignPolyfill target, sources...
+
   # Iterate over all key-value pairs one by one.
   #
   # The callback parameters are analogue to Array.forEach callback parameters:
@@ -14,13 +40,12 @@ O = {
   # NOTE: There is no way to stop/break an iteration done with `each`. Use
   #       `Array.some` or `Array.every` if that is needed.
   each: (fn, object) ->
-    wrapped = (object) ->
-      (element, index, array) ->
-        fn.apply(null, [ object[element], element, object ])
+    eachFn = (element, index, array) ->
+      fn.apply(object, [object[element], element, object])
 
     A.each(wrapped(object), Object.keys(object))
 
-    return undefined
+    undefined
 
   # Compare (simple, one-level) equality of two objects.
   #
@@ -33,19 +58,19 @@ O = {
   #       otherwise, we need to adapt to provide more (or even less)
   #       sophisticated equality checks.
   equals: (a, b) ->
-    return false unless T.is_object(a) && T.is_object(b)
+    return false unless T.isObject(a) && T.isObject(b)
 
-    keys_a = Object.keys(a)
-    keys_b = Object.keys(b)
+    keysA = keys(a)
+    keysB = keys(b)
 
-    return false if keys_a.length != keys_b.length
-    return false unless A.equals(keys_a, keys_b)
+    return false if keysA.length != keysB.length
+    return false unless A.equals(keysA, keysB)
 
     fn = (previous, value, key, obj) ->
-      return false unless T.type_of(value) == T.type_of(b[key])
+      return false unless T.typeOf(value) == T.typeOf(b[key])
 
-      return previous && A.equals(value, b[key]) if T.is_array(value)
-      return previous if T.is_object(value)
+      return previous && A.equals(value, b[key]) if T.isArray(value)
+      return previous if T.isObject(value)
 
       return previous && b[key] == value
 
@@ -53,10 +78,9 @@ O = {
 
   # Test whether all elements pass given function.
   every: (fn, object) ->
-    wrapped = (fn, object) ->
-      (value, index, array) -> fn(object[value], value, object)
+    everyFn = (value, index, array) -> fn(object[value], value, object)
 
-    A.every(wrapped(fn, object), Object.keys(object))
+    A.every everyFn, O.keys(object)
 
   # Filter the contents of an object by its keys and return a new object with
   # all the keys matching the filter.
@@ -66,17 +90,17 @@ O = {
         new_object[key] = object[key]
         new_object
 
-    A.reduce(wrapped(object), {}, A.filter(fn, Object.keys(object)))
+    A.reduce wrapped(object), {}, A.filter(fn, Object.keys(object))
 
   # Check whether given object's keys include the passed key.
-  has_key: (key, object) ->
-    A.has_element(key, Object.keys(object))
+  hasKey: (key, object) ->
+    A.hasElement(key, Object.keys(object))
 
   # Check whether given object holds the passed value.
-  has_value: (value, object) ->
+  hasValue: (value, object) ->
     wrapped = (value) -> (v) -> v == value
 
-    O.some(wrapped(value), object)
+    O.some wrapped(value), object
 
   # Iterate over all key-value pairs one by one, store the result in a new
   # object and return it.
@@ -89,44 +113,49 @@ O = {
   # NOTE: There is no way to stop/break an iteration done with `map`. Use
   #       `Array.some` or `Array.every` if that is needed.
   map: (fn, object) ->
-    results = {}
+    reduceFn = (seed, element, index, array) ->
+        result       = fn(element, index, array)
+        [key, value] = [result[0] || index, result[1] || result]
+        seed[key]    = value
 
-    wrapped = (results, fn) ->
-      (element, index, array) ->
-        result = fn(element, index, array)
+        seed
 
-        # TODO: Test and verify this is common practice.
-        #       Look at Ruby/Python map code for that.
-        if T.is_array(result) && result.length == 2
-          results[result[0]] = results[result[1]]
-          return
+    O.reduce(wrapped(results, fn), {}, object)
 
-        results[index] = result
-
-    O.each(wrapped(results, fn), object)
-
-    results
-
-  # TODO: DOCS
-  reduce: (fn, initial_value, object) ->
-    wrapped = (fn, object) ->
-      (previous, current, key, array) ->
-        # Invoke givne callback and give it:
+  # Reduce given object by iterating over its keys and values. Uses
+  # `Array.reduce` but replaces the index parameter of the callback to pass the
+  # key.
+  #
+  # Takes a function, an initial value and the object to iterate over.
+  #
+  # Function parameters:
+  #
+  # * seed (previous value)
+  # * current value (`object[key]`)
+  # * current key
+  # * original object
+  #
+  # The return value of each invocation of given function will be passed as seed
+  # to the next invocation.
+  #
+  # Returns the result of the last function invocation.
+  reduce: (fn, initialValue, object) ->
+    reduceFn = (previous, key, index, keys) ->
+        # Invoke given callback with:
         #
         #  * previous value
         #  * value for current key
         #  * current key as index
         #  * the original object
-        fn(previous, object[current], current, object)
+        fn(previous, key, object[key], object)
 
-    A.reduce(wrapped(fn, object), initial_value, Object.keys(object))
+    A.reduce(reduceFn, initialValue, Object.keys(object))
 
   # TODO: DOCS
   some: (fn, object) ->
-    wrapped = (fn, object) ->
-      (value, index, array) -> fn(object[value], value, object)
+    someFn = (value, index, array) -> fn(object[value], value, object)
 
-    A.some(wrapped(fn, object), Object.keys(object))
+    A.some someFn, Object.keys(object)
 }
 
 module.exports = O

@@ -28,17 +28,17 @@
     "coffee-script": "> 1.7.0",
     "grunt": "0.4.x",
     "grunt-cli": ">=0.1.6",
-
     "browserify": "*",
-
     "grunt-contrib-clean": "*",
     "grunt-contrib-coffee": "*",
     "grunt-contrib-uglify": "*",
     "grunt-contrib-copy": "*",
     "grunt-contrib-watch": "*",
-
     "grunt-browserify": "*",
     "grunt-modernizr": "*",
     "grunt-bower-task": "git://github.com/creatorrr/grunt-bower-task.git"
+  },
+  "dependencies": {
+    "colors": "^1.1.2"
   }
 }
