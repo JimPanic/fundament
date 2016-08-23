@@ -21,8 +21,6 @@ A = {
 
     return undefined
 
-  isEmpty: (array) -> !array? and array.length == 0
-
   # Compares length & value equality of two arrays.
   #
   # NOTE: This method also takes the order into account.
@@ -53,6 +51,8 @@ A = {
 
   # Composable wrapper for `Array.prototype.indexOf`
   indexOf: (element, array) -> array.indexOf(element)
+
+  isEmpty: (array) -> !array? and array.length == 0
 
   # Composable wrapper for `Array.prototype.join`
   join: (seperator, array) -> array.join(seperator)
