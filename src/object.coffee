@@ -144,8 +144,8 @@ O = {
         # Invoke given callback with:
         #
         #  * previous value
-        #  * value for current key
         #  * current key as index
+        #  * value for current key
         #  * the original object
         fn(previous, key, object[key], object)
 

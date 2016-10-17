@@ -1,4 +1,7 @@
 A = {
+  # Intentional duplication of code with `types.coffee` to keep them decoupled.
+  isArray: (array) -> array?.constructor?.name is 'Array'
+
   # Create a clone of given array and return it.
   clone: (array) -> array.slice(0)
 
@@ -6,7 +9,7 @@ A = {
   # and is considered the base to concatinate to.
   #
   # NOTE: This is a composable wrapper for `Array.prototype.concat`
-  concat: (args..., array) -> array.concat.apply(null, args)
+  concat: (args..., array) -> array.concat(args...)
 
   # Iterate over all elements of given array.
   #
@@ -44,7 +47,14 @@ A = {
     array[0]
 
   # Transform nested arrays into one flat, continuous array
-  flatten: (array) -> A.reduce array, [], (a, b) -> a.concat(b)
+  flatten: (array) ->
+    fn = (seed, element) ->
+      flattened = element
+      flattened = A.flatten element if element.constructor.name is 'Array'
+
+      seed.concat(flattened)
+
+    A.reduce fn, [], array
 
   # Find out whether the array holds a given value.
   hasElement: (element, array) -> -1 != array.indexOf(element)
@@ -77,10 +87,7 @@ A = {
   replace: (index, n, replace_with, array) ->
     A.clone(array).splice(index, n, replace_with)
 
-  # Create a reversed version of the array and return it.
-  #
-  # NOTE: This is just a wrapper for `Array.reverse`, which reverses the array
-  #       in-place.
+  # Create a copy of the array, reverse it and return it.
   reverse: (array) -> A.clone(array).reverse()
 
   # Composable wrapper for `Array.slice`

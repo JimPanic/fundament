@@ -30,7 +30,7 @@
     "url": "https://github.com/JimPanic/fundament.git"
   },
   "scripts": {
-    "prepublish": "gulp coffee"
+    "prepublish": "/usr/bin/env gulp"
   },
   "devDependencies": {
     "coffee-script": "^1.10.0",

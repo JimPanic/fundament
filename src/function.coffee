@@ -43,7 +43,7 @@ F = {
   #   f = (a, b, c) -> console.log a, b, c
   #   g = partial f, 'partially applied'
   #   #=> g == (b, c) -> f 'partially applied', b, c
-  partial: (fn, bound...) -> (args...) -> fn.apply @, A.concat(bound, args)
+  partial: (fn, bound...) -> (args...) -> fn.apply @, A.concat(args, bound)
 
   # Partially apply arguments to a function, but on the right hand side of the
   # list
